@@ -1,0 +1,36 @@
+from openpyxl import load_workbook
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
+
+lista_email = [] # cria uma Lista de emais
+Lista_login = [] # cria uma Lista de logins
+Lista_Senha = [] # cria uma Lista de Senhas
+tabela = load_workbook("****") #Abre o arquivo excel para leitura
+aba_ativa = tabela.active#verifica as planilhas ativas para a leitura
+for celula in aba_ativa["B"]:
+    lista_email.append(celula.value)# adiciona os emails a lista
+        
+for celula in aba_ativa["C"]:
+    Lista_login.append(celula.value)  #Adiciona os logins a lista
+        
+for celula in aba_ativa["F"]:
+    Lista_Senha.append(celula.value)#Adiciona as senhas a lista
+        
+lista_filtrada_EMAIL = [item for item in lista_email if item is not None]#Filtra os campos vazios
+lista_filtrada_LOGIN = [item for item in Lista_login if item is not None]#''''''
+lista_filtrada_SENHA = [item for item in Lista_Senha if item is not None]#''''''
+
+for i in range(len(lista_filtrada_EMAIL)): #Loop que vai percorrer a lista inteira
+    msg = MIMEMultipart()
+    msg['Subject'] = 'Teste' #Assunto
+    msg['From'] = '*****' # Email base de envio
+    msg['To'] = lista_filtrada_EMAIL[i+1]# Destinatario
+    message = f"Ola tanana seu login e {lista_filtrada_LOGIN[i+1]} e sua senha e {int(lista_filtrada_SENHA[i+1])}"#Mensagem padrao a ser enviada
+    msg.attach(MIMEText(message, 'plain')) # juncao para envio
+
+    server = smtplib.SMTP('smtp.outlook.com', port=587) # porta de servidor do email que vai enviar
+    server.starttls()
+    server.login('*****', '*****') # login /senha
+    server.sendmail(msg['From'], msg['To'], msg.as_string()) # email pronto
+    server.quit()#envio
